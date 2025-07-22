@@ -136,12 +136,43 @@ export class ListService extends BaseClickUpService {
           responseData = responseData.data;
         }
         
-        // Validate that we have the minimum required fields
-        if (!responseData.id) {
-          throw new Error(`API response missing required 'id' field. Response structure: ${JSON.stringify(Object.keys(responseData))}`);
+        // For template creation, ClickUp returns just the ID immediately when return_immediately=true
+        // We need to handle this case specially
+        if (typeof responseData === 'string') {
+          // Response is just the list ID as a string
+          return {
+            id: responseData,
+            name: listData.name || 'Unknown',
+            content: '',
+            // These will be filled in by the handler if available
+            folder: null,
+            space: null
+          };
         }
         
-        return responseData;
+        // Check if response is just an object with an ID
+        if (responseData && typeof responseData === 'object') {
+          // If it only has an ID and maybe a few other fields, it's the immediate response
+          if (responseData.id && Object.keys(responseData).length <= 3) {
+            return {
+              id: responseData.id,
+              name: listData.name || 'Unknown',
+              content: responseData.content || '',
+              folder: null,
+              space: null,
+              ...responseData // Include any other fields that might be present
+            };
+          }
+          
+          // Full object response - validate required fields
+          if (!responseData.id) {
+            throw new Error(`API response missing required 'id' field. Response structure: ${JSON.stringify(Object.keys(responseData))}`);
+          }
+          
+          return responseData;
+        }
+        
+        throw new Error(`Unexpected API response structure: ${typeof responseData}`);
       });
     } catch (error) {
       throw this.handleError(error, `Failed to create list from template ${templateId} in folder ${folderId}`);

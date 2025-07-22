@@ -588,31 +588,40 @@ export async function handleCreateListFromTemplate(parameters: any) {
     // Create the list from template in the folder
     const newList = await listService.createListFromTemplate(targetFolderId, templateId, listData);
     
-    // Handle cases where the API might return partial data
-    const safeNewList = {
-      id: newList.id || 'unknown',
-      name: newList.name || name,
-      content: newList.content || '',
-      folder: newList.folder || { id: targetFolderId, name: 'Unknown Folder' },
-      space: newList.space || { id: 'unknown', name: 'Unknown Space' }
-    };
+    // ClickUp template API returns immediately with just the ID when return_immediately=true
+    // We need to handle this case gracefully
+    const listId = newList.id;
+    const listName = newList.name || name;
+    
+    // Try to get additional folder/space info if available
+    let folderInfo = { id: targetFolderId, name: 'Target Folder' };
+    let spaceInfo = { id: 'unknown', name: 'Clients' };
+    
+    // If the response includes full folder/space data, use it
+    if (newList.folder) {
+      folderInfo = newList.folder;
+    }
+    if (newList.space) {
+      spaceInfo = newList.space;
+    }
+    
+    const successMessage = newList.folder && newList.space ? 
+      `List "${listName}" created successfully from template in folder "${folderInfo.name}"` :
+      `List "${listName}" is being created from template (ID: ${listId}). The template is being applied in the background and the list will be fully populated shortly.`;
     
     return sponsorService.createResponse({
-      id: safeNewList.id,
-      name: safeNewList.name,
-      content: safeNewList.content,
-      folder: {
-        id: safeNewList.folder.id,
-        name: safeNewList.folder.name
-      },
-      space: {
-        id: safeNewList.space.id,
-        name: safeNewList.space.name
-      },
-      url: `https://app.clickup.com/${config.clickupTeamId}/v/l/${safeNewList.id}`,
+      id: listId,
+      name: listName,
+      content: newList.content || '',
+      folder: folderInfo,
+      space: spaceInfo,
+      url: `https://app.clickup.com/${config.clickupTeamId}/v/l/${listId}`,
       templateId,
-      message: `List "${safeNewList.name}" created successfully from template in folder "${safeNewList.folder.name}"`,
+      message: successMessage,
+      status: newList.folder ? 'completed' : 'creating',
+      note: newList.folder ? null : 'List creation in progress. Template content will be applied shortly.',
       debug: {
+        immediateResponse: !newList.folder,
         originalResponse: newList,
         requestData: { targetFolderId, templateId, listData }
       }
