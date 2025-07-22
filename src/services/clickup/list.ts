@@ -108,11 +108,40 @@ export class ListService extends BaseClickUpService {
     
     try {
       return await this.makeRequest(async () => {
-        const response = await this.client.post<ClickUpList>(
+        const response = await this.client.post(
           `/folder/${folderId}/list_template/${templateId}`,
           listData
         );
-        return response.data;
+        
+        // Log the response for debugging
+        this.logOperation('createListFromTemplate_response', { 
+          status: response.status, 
+          data: response.data,
+          dataKeys: response.data ? Object.keys(response.data) : null,
+          fullResponse: JSON.stringify(response.data, null, 2)
+        });
+        
+        // Check if response has the expected structure
+        if (!response.data) {
+          throw new Error(`API returned empty response data. Status: ${response.status}`);
+        }
+        
+        // Handle different possible response structures
+        let responseData = response.data;
+        
+        // Some ClickUp endpoints wrap the response in additional properties
+        if (responseData.list) {
+          responseData = responseData.list;
+        } else if (responseData.data) {
+          responseData = responseData.data;
+        }
+        
+        // Validate that we have the minimum required fields
+        if (!responseData.id) {
+          throw new Error(`API response missing required 'id' field. Response structure: ${JSON.stringify(Object.keys(responseData))}`);
+        }
+        
+        return responseData;
       });
     } catch (error) {
       throw this.handleError(error, `Failed to create list from template ${templateId} in folder ${folderId}`);

@@ -588,24 +588,44 @@ export async function handleCreateListFromTemplate(parameters: any) {
     // Create the list from template in the folder
     const newList = await listService.createListFromTemplate(targetFolderId, templateId, listData);
     
+    // Handle cases where the API might return partial data
+    const safeNewList = {
+      id: newList.id || 'unknown',
+      name: newList.name || name,
+      content: newList.content || '',
+      folder: newList.folder || { id: targetFolderId, name: 'Unknown Folder' },
+      space: newList.space || { id: 'unknown', name: 'Unknown Space' }
+    };
+    
     return sponsorService.createResponse({
-      id: newList.id,
-      name: newList.name,
-      content: newList.content,
+      id: safeNewList.id,
+      name: safeNewList.name,
+      content: safeNewList.content,
       folder: {
-        id: newList.folder?.id,
-        name: newList.folder?.name
+        id: safeNewList.folder.id,
+        name: safeNewList.folder.name
       },
       space: {
-        id: newList.space.id,
-        name: newList.space.name
+        id: safeNewList.space.id,
+        name: safeNewList.space.name
       },
-      url: `https://app.clickup.com/${config.clickupTeamId}/v/l/${newList.id}`,
+      url: `https://app.clickup.com/${config.clickupTeamId}/v/l/${safeNewList.id}`,
       templateId,
-      message: `List "${name}" created successfully from template in folder${newList.folder ? ` "${newList.folder.name}"` : ''}`
+      message: `List "${safeNewList.name}" created successfully from template in folder "${safeNewList.folder.name}"`,
+      debug: {
+        originalResponse: newList,
+        requestData: { targetFolderId, templateId, listData }
+      }
     }, true);
   } catch (error: any) {
-    return sponsorService.createErrorResponse(`Failed to create list from template: ${error.message}`);
+    return sponsorService.createErrorResponse(
+      `Failed to create list from template: ${error.message}\n\nDebug Info:\n` +
+      `- Template ID: ${templateId}\n` +
+      `- Folder ID: ${targetFolderId}\n` +
+      `- List Name: ${name}\n` +
+      `- Options: ${JSON.stringify(listData.options || {}, null, 2)}\n` +
+      `- Error Type: ${error.constructor.name}`
+    );
   }
 }
 
