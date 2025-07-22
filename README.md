@@ -1,10 +1,60 @@
 <img src="assets/images/clickup_mcp_server_social_image.png" alt="ClickUp MCP Server" width="100%">
 
-![Total Supporters](https://img.shields.io/badge/🏆%20Total%20Supporters-4-gold)
-[![GitHub Stars](https://img.shields.io/github/stars/TaazKareem/clickup-mcp-server?style=flat&logo=github)](https://github.com/TaazKareem/clickup-mcp-server/stargazers)
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-brightgreen.svg)](https://github.com/TaazKareem/clickup-mcp-server/graphs/commit-activity)
+[![Original Repository](https://img.shields.io/badge/Original-@taazkareem/clickup--mcp--server-blue)](https://github.com/taazkareem/clickup-mcp-server)
+[![Enhanced Fork](https://img.shields.io/badge/Enhanced_Fork-Titanium--Labs-green)](https://github.com/Titanium-Labs/clickup-mcp-server)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-brightgreen.svg)](https://github.com/Titanium-Labs/clickup-mcp-server/graphs/commit-activity)
 
-A Model Context Protocol (MCP) server for integrating ClickUp tasks with AI applications. This server allows AI agents to interact with ClickUp tasks, spaces, lists, and folders through a standardized protocol.
+# ClickUp MCP Server (Enhanced Fork)
+
+An enhanced fork of the comprehensive Model Context Protocol (MCP) server for ClickUp integration. This server allows AI agents to interact with ClickUp tasks, spaces, lists, and folders through a standardized protocol.
+
+## 🆕 Enhanced Features in This Fork
+
+- **📋 Template Support**: Create lists from templates with advanced options including:
+  - Date remapping and project timeline adjustment
+  - Selective import of template features (tags, assignees, custom fields, etc.)
+  - Weekend handling for date calculations
+  - Flexible folder targeting with name resolution
+- **⚡ Extended API Coverage**: Additional ClickUp API endpoints for advanced workflows
+- **🔧 Enhanced List Management**: More sophisticated list creation capabilities
+
+### 🎯 New Tool: `create_list_from_template`
+
+Create lists from existing templates with comprehensive customization:
+
+```json
+{
+  "name": "Q1 Marketing Campaign",
+  "templateId": "901234567890",
+  "folderId": "123456789012",
+  "start_date": "2024-01-01T09:00:00",
+  "due_date": "2024-03-31T17:00:00",
+  "remap_start_date": true,
+  "skip_weekends": true,
+  "old_assignees": true,
+  "old_tags": true,
+  "custom_fields": true
+}
+```
+
+**Key Features:**
+- **25+ configuration options** for selective template import
+- **Smart date remapping** based on project timeline
+- **Weekend-aware scheduling** for business day calculations
+- **Flexible targeting** via folder ID or name + space resolution
+
+## 🔄 Fork Comparison
+
+| Feature | Original (@taazkareem) | Enhanced Fork (Titanium-Labs) |
+|---------|------------------------|--------------------------------|
+| **Tools Count** | 36 tools | 37 tools |
+| **Template Support** | ❌ | ✅ Full template management |
+| **Date Remapping** | ❌ | ✅ Smart timeline calculations |
+| **Weekend Handling** | ❌ | ✅ Business day awareness |
+| **Installation** | NPX + Smithery | Git clone (recommended) |
+| **API Coverage** | Comprehensive | Extended |
+| **Use Case** | General ClickUp integration | Enterprise project management |
 
 > 🚧 **Status Update:** Working with the ClickUp team... ✨
 
@@ -18,22 +68,52 @@ A Model Context Protocol (MCP) server for integrating ClickUp tasks with AI appl
 1. Get your credentials:
    - ClickUp API key from [ClickUp Settings](https://app.clickup.com/settings/apps)
    - Team ID from your ClickUp workspace URL
-2. Choose either hosted installation (sends webhooks) or NPX installation (downloads to local path and installs dependencies)
-3. Use natural language to manage your workspace!
+2. Choose installation method (Git clone, original NPX, or hosted)
+3. Use natural language to manage your workspace with enhanced template features!
 
-## Smithery Installation (Quick Start)
+## Installation Options
 
-[![smithery badge](https://smithery.ai/badge/@taazkareem/clickup-mcp-server)](https://smithery.ai/server/@TaazKareem/clickup-mcp-server)
+### Option 1: Git Clone (Recommended for Enhanced Features)
 
-The server is hosted on [Smithery](https://smithery.ai/server/@taazkareem/clickup-mcp-server). There, you can preview the available tools or copy the commands to run on your specific client app.
+To use the enhanced fork with template support:
 
-## NPX Installation
+```bash
+# Clone the enhanced fork
+git clone https://github.com/Titanium-Labs/clickup-mcp-server.git
+cd clickup-mcp-server
+
+# Install dependencies
+npm install
+
+# Build the project
+npm run build
+
+# Use in your MCP client configuration
+```
+
+**MCP Client Configuration:**
+```json
+{
+  "mcpServers": {
+    "ClickUp-Enhanced": {
+      "command": "node",
+      "args": ["/path/to/clickup-mcp-server/build/index.js"],
+      "env": {
+        "CLICKUP_API_KEY": "your-api-key",
+        "CLICKUP_TEAM_ID": "your-team-id",
+        "DOCUMENT_SUPPORT": "true"
+      }
+    }
+  }
+}
+```
+
+### Option 2: Original NPX Installation
 
 [![NPM Version](https://img.shields.io/npm/v/@taazkareem/clickup-mcp-server.svg?style=flat&logo=npm)](https://www.npmjs.com/package/@taazkareem/clickup-mcp-server)
-[![Dependency Status](https://img.shields.io/badge/dependencies-up%20to%20date-brightgreen)](https://github.com/TaazKareem/clickup-mcp-server/blob/main/package.json)
 [![NPM Downloads](https://img.shields.io/npm/dm/@taazkareem/clickup-mcp-server.svg?style=flat&logo=npm)](https://npmcharts.com/compare/@taazkareem/clickup-mcp-server?minimal=true)
 
-Add this entry to your client's MCP settings JSON file:
+To use the original version without template features:
 
 ```json
 {
@@ -59,6 +139,12 @@ Or use this npx command:
 `npx -y @taazkareem/clickup-mcp-server@latest --env CLICKUP_API_KEY=your-api-key --env CLICKUP_TEAM_ID=your-team-id`
 
 **Obs: if you don't pass "DOCUMENT_SUPPORT": "true", the default is false and document support will not be active.**
+
+### Option 3: Smithery Installation (Original Version)
+
+[![smithery badge](https://smithery.ai/badge/@taazkareem/clickup-mcp-server)](https://smithery.ai/server/@TaazKareem/clickup-mcp-server)
+
+The original server is hosted on [Smithery](https://smithery.ai/server/@taazkareem/clickup-mcp-server). You can preview the available tools or copy commands for your client app. **Note**: Smithery hosts the original version without template features.
 
 ### Tool Filtering
 
@@ -91,11 +177,17 @@ export DISABLED_TOOLS="delete_task,delete_bulk_tasks"
 
 **Example:**
 ```bash
-# Only enable task creation and reading tools
+# Original version - Only enable task creation and reading tools
 npx -y @taazkareem/clickup-mcp-server@latest \
   --env CLICKUP_API_KEY=your-api-key \
   --env CLICKUP_TEAM_ID=your-team-id \
   --env ENABLED_TOOLS=create_task,get_task,get_workspace_hierarchy
+
+# Enhanced fork - Include template tools
+node /path/to/clickup-mcp-server/build/index.js \
+  --env CLICKUP_API_KEY=your-api-key \
+  --env CLICKUP_TEAM_ID=your-team-id \
+  --env ENABLED_TOOLS=create_task,get_task,get_workspace_hierarchy,create_list_from_template
 ```
 
 Please filter tools you don't need if you are having issues with the number of tools or any context limitations.
@@ -205,7 +297,9 @@ npm run sse-client
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | • Create, update, and delete tasks<br>• Move and duplicate tasks anywhere<br>• Support for single and bulk operations<br>• Set start/due dates with natural language<br>• Create and manage subtasks<br>• Add comments and attachments | • Create, update, and delete space tags<br>• Add and remove tags from tasks<br>• Use natural language color commands<br>• Automatic contrasting foreground colors<br>• View all space tags<br>• Tag-based task organization across workspace |
 | ⏱️ **Time Tracking**                                                                                                                                                                                                                                          | 🌳 **Workspace Organization**                                                                                                                                                                                                                                         |
-| • View time entries for tasks<br>• Start/stop time tracking on tasks<br>• Add manual time entries<br>• Delete time entries<br>• View currently running timer<br>• Track billable and non-billable time                                 | • Navigate spaces, folders, and lists<br>• Create and manage folders<br>• Organize lists within spaces<br>• Create lists in folders<br>• View workspace hierarchy<br>• Efficient path navigation                                             |
+| • View time entries for tasks<br>• Start/stop time tracking on tasks<br>• Add manual time entries<br>• Delete time entries<br>• View currently running timer<br>• Track billable and non-billable time                                 | • Navigate spaces, folders, and lists<br>• Create and manage folders<br>• Organize lists within spaces<br>• Create lists in folders<br>• **🆕 Create lists from templates**<br>• View workspace hierarchy<br>• Efficient path navigation |
+| 📋 **Template Management (Enhanced Fork)**                                                                                                                                                                                                                      | 🎯 **Project Planning (Enhanced)**                                                                                                                                                                                                                                    |
+| • **Create lists from templates with 25+ options**<br>• **Smart date remapping based on project timeline**<br>• **Weekend-aware scheduling calculations**<br>• **Selective import of template features**<br>• **Flexible folder targeting** | • **Advanced project timeline management**<br>• **Template-based project initialization**<br>• **Automated date calculations and adjustments**<br>• **Streamlined workflow setup from templates**<br>• **Business day-aware scheduling** |
 | 📄 **Document Management**                                                                                                                                                                                                                                      | 👥 **Member Management**                                                                                                                                                                                                                                             |
 | • Document Listing through all workspace<br>• Document Page listing<br>• Document Page Details<br>• Document Creation<br>• Document page update (append & prepend)                                                                       | • Find workspace members by name or email<br>• Resolve assignees for tasks<br>• View member details and permissions<br>• Assign tasks to users during creation and updates<br>• Support for user IDs, emails, or usernames<br>• Team-wide user management                            |
 | ⚡ **Integration Features**                                                                                                                                                                                                                                      | 🏗️ **Architecture & Performance**                                                                                                                                                                                                                                        |
@@ -289,6 +383,63 @@ When creating or updating tasks, you can assign users using the `assignees` para
 
 The member management tools help resolve user references when needed.
 
+## 📋 Template Management (Enhanced Fork Feature)
+
+This enhanced fork introduces comprehensive template support through the `create_list_from_template` tool, enabling sophisticated project initialization workflows.
+
+### Key Template Features
+
+**Date Remapping & Timeline Management:**
+- **Smart date calculations** based on project start/due dates
+- **Weekend-aware scheduling** that skips non-business days
+- **Timeline scaling** to adjust template duration to project needs
+
+**Selective Template Import (25+ Options):**
+```json
+{
+  "name": "Q1 Marketing Campaign",
+  "templateId": "template_123",
+  "folderId": "folder_456",
+  "start_date": "2024-01-01T09:00:00",
+  "due_date": "2024-03-31T17:00:00",
+  "remap_start_date": true,
+  "skip_weekends": true,
+  "old_assignees": true,
+  "old_tags": true,
+  "custom_fields": true,
+  "attachments": false,
+  "automation": true,
+  "include_views": true
+}
+```
+
+**Advanced Configuration Options:**
+- **Content Import**: `old_tags`, `custom_fields`, `attachments`, `old_checklists`
+- **User Management**: `old_assignees`, `old_followers`, `old_subtask_assignees`
+- **Workflow Features**: `automation`, `include_views`, `recur_settings`
+- **Relationships**: `internal_dependencies`, `external_dependencies`, `relationships`
+- **Performance**: `return_immediately` for async creation
+
+### Business Use Cases
+
+**Project Initialization:**
+```bash
+# Create a quarterly planning project from template
+# with dates remapped to Q1 2024, preserving assignees and tags
+```
+
+**Template Customization:**
+```bash
+# Import only structure and custom fields, skip old assignees
+# Perfect for reusing project structures with new teams
+```
+
+**Timeline Management:**
+```bash
+# Automatically adjust all task dates based on new project timeline
+# Skip weekends to ensure business-day scheduling
+```
+
 ## Prompts
 
 Not yet implemented and not supported by all client apps. Request a feature for a Prompt implementation that would be most beneficial for your workflow (without it being too specific). Examples:
@@ -326,7 +477,14 @@ If you find this project useful, please consider supporting:
 
 ## Acknowledgements
 
-Special thanks to [ClickUp](https://clickup.com) for their excellent API and services that make this integration possible.
+**Enhanced Fork Credits:**
+- **Original Author**: [Talib Kareem (@TaazKareem)](https://github.com/taazkareem) for the excellent foundation and comprehensive ClickUp MCP server
+- **Original Repository**: [@taazkareem/clickup-mcp-server](https://github.com/taazkareem/clickup-mcp-server)
+- **Enhanced Fork**: [Titanium Labs](https://github.com/Titanium-Labs) for template management features
+
+**Special Thanks:**
+- [ClickUp](https://clickup.com) for their excellent API and services that make this integration possible
+- The MCP community for the protocol specification and ecosystem
 
 ## Contributing
 
