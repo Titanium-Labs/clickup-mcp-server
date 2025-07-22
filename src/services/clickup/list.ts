@@ -17,7 +17,8 @@ import { BaseClickUpService, ErrorCode, ClickUpServiceError, ServiceResponse } f
 import { 
   ClickUpList,
   ClickUpTask,
-  CreateListData
+  CreateListData,
+  CreateListFromTemplateData
 } from './types.js';
 import { WorkspaceService } from './workspace.js';
 
@@ -88,6 +89,33 @@ export class ListService extends BaseClickUpService {
       });
     } catch (error) {
       throw this.handleError(error, `Failed to create list in folder ${folderId}`);
+    }
+  }
+
+  /**
+   * Create a new list from a template in a folder
+   * @param folderId The ID of the folder to create the list in
+   * @param templateId The ID of the template to use
+   * @param listData The data for the new list including template options
+   * @returns The created list
+   */
+  async createListFromTemplate(
+    folderId: string, 
+    templateId: string, 
+    listData: CreateListFromTemplateData
+  ): Promise<ClickUpList> {
+    this.logOperation('createListFromTemplate', { folderId, templateId, ...listData });
+    
+    try {
+      return await this.makeRequest(async () => {
+        const response = await this.client.post<ClickUpList>(
+          `/folder/${folderId}/list_template/${templateId}`,
+          listData
+        );
+        return response.data;
+      });
+    } catch (error) {
+      throw this.handleError(error, `Failed to create list from template ${templateId} in folder ${folderId}`);
     }
   }
 

@@ -18,7 +18,11 @@
     "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
     "start": "node build/index.js",
     "dev": "tsc -w",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "docs:api": "node scripts/generate-api-docs.js",
+    "docs:diagrams": "node scripts/generate-diagrams.js",
+    "docs:all": "node scripts/generate-all-docs.js",
+    "docs": "npm run docs:all"
   },
   "keywords": [
     "clickup",

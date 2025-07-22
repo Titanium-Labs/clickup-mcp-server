@@ -61,6 +61,7 @@ import {
 import {
   createListTool, handleCreateList,
   createListInFolderTool, handleCreateListInFolder,
+  createListFromTemplateTool, handleCreateListFromTemplate,
   getListTool, handleGetList,
   updateListTool, handleUpdateList,
   deleteListTool, handleDeleteList
@@ -191,6 +192,7 @@ export function configureServer() {
         getCurrentTimeEntryTool,
         createListTool,
         createListInFolderTool,
+        createListFromTemplateTool,
         getListTool,
         updateListTool,
         deleteListTool,
@@ -217,7 +219,7 @@ export function configureServer() {
 
   // Register CallTool handler with proper logging
   logger.info("Registering tool handlers", {
-    toolCount: 36,
+    toolCount: 37,
     categories: ["workspace", "task", "time-tracking", "list", "folder", "tag", "member", "document"]
   });
 
@@ -278,6 +280,8 @@ export function configureServer() {
           return handleCreateList(params);
         case "create_list_in_folder":
           return handleCreateListInFolder(params);
+        case "create_list_from_template":
+          return handleCreateListFromTemplate(params);
         case "get_list":
           return handleGetList(params);
         case "update_list":

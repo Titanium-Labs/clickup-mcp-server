@@ -11,7 +11,8 @@
 
 import { 
   CreateListData, 
-  ClickUpList
+  ClickUpList,
+  CreateListFromTemplateData
 } from '../services/clickup/types.js';
 import { listService, workspaceService } from '../services/shared.js';
 import config from '../config.js';
@@ -102,6 +103,164 @@ export const createListInFolderTool = {
       }
     },
     required: ["name"]
+  }
+};
+
+/**
+ * Tool definition for creating a list from a template in a folder
+ */
+export const createListFromTemplateTool = {
+  name: "create_list_from_template",
+  description: `Creates a list from a template in a ClickUp folder. Use folderId + templateId + list name. Supports date remapping and selective import of template features. Name and templateId required.`,
+  inputSchema: {
+    type: "object",
+    properties: {
+      name: {
+        type: "string",
+        description: "Name of the new list to be created"
+      },
+      templateId: {
+        type: "string",
+        description: "ID of the template to use for creating the list"
+      },
+      folderId: {
+        type: "string",
+        description: "ID of the folder to create the list in. If you have this, you don't need folderName or space information."
+      },
+      folderName: {
+        type: "string",
+        description: "Name of the folder to create the list in. When using this, you MUST also provide either spaceName or spaceId."
+      },
+      spaceId: {
+        type: "string",
+        description: "ID of the space containing the folder. Required when using folderName instead of folderId."
+      },
+      spaceName: {
+        type: "string", 
+        description: "Name of the space containing the folder. Required when using folderName instead of folderId."
+      },
+      return_immediately: {
+        type: "boolean",
+        description: "Return list ID immediately without waiting for full creation (default: true)"
+      },
+      content: {
+        type: "string",
+        description: "Description or content of the list"
+      },
+      time_estimate: {
+        type: "number",
+        description: "Include time (hours, minutes and seconds)"
+      },
+      automation: {
+        type: "boolean",
+        description: "Import automation settings from template"
+      },
+      include_views: {
+        type: "boolean",
+        description: "Import views from template"
+      },
+      old_due_date: {
+        type: "boolean",
+        description: "Import tasks' due dates from template"
+      },
+      old_start_date: {
+        type: "boolean",
+        description: "Import tasks' start dates from template"
+      },
+      old_followers: {
+        type: "boolean",
+        description: "Import tasks' watchers from template"
+      },
+      comment_attachments: {
+        type: "boolean",
+        description: "Import tasks' comment attachments from template"
+      },
+      recur_settings: {
+        type: "boolean",
+        description: "Import tasks' recurring settings from template"
+      },
+      old_tags: {
+        type: "boolean",
+        description: "Import tasks' tags from template"
+      },
+      old_statuses: {
+        type: "boolean",
+        description: "Import tasks' status settings from template"
+      },
+      subtasks: {
+        type: "boolean",
+        description: "Import tasks' subtasks from template"
+      },
+      custom_type: {
+        type: "boolean",
+        description: "Import tasks' task types from template"
+      },
+      old_assignees: {
+        type: "boolean",
+        description: "Import tasks' assignees from template"
+      },
+      attachments: {
+        type: "boolean",
+        description: "Import tasks' attachments from template"
+      },
+      comment: {
+        type: "boolean",
+        description: "Import tasks' comments from template"
+      },
+      old_status: {
+        type: "boolean",
+        description: "Import tasks' current statuses from template"
+      },
+      external_dependencies: {
+        type: "boolean",
+        description: "Import tasks' external dependencies from template"
+      },
+      internal_dependencies: {
+        type: "boolean",
+        description: "Import tasks' internal dependencies from template"
+      },
+      priority: {
+        type: "boolean",
+        description: "Import tasks' priorities from template"
+      },
+      custom_fields: {
+        type: "boolean",
+        description: "Import tasks' Custom Fields from template"
+      },
+      old_checklists: {
+        type: "boolean",
+        description: "Import tasks' checklists from template"
+      },
+      relationships: {
+        type: "boolean",
+        description: "Import tasks' relationships from template"
+      },
+      old_subtask_assignees: {
+        type: "boolean",
+        description: "Import tasks' subtask assignees from template"
+      },
+      start_date: {
+        type: "string",
+        description: "Project start date for remapping dates (ISO datetime format: YYYY-MM-DDTHH:mm:ss)"
+      },
+      due_date: {
+        type: "string",
+        description: "Project due date for remapping dates (ISO datetime format: YYYY-MM-DDTHH:mm:ss)"
+      },
+      remap_start_date: {
+        type: "boolean",
+        description: "Remap start dates based on project start/due dates"
+      },
+      skip_weekends: {
+        type: "boolean",
+        description: "Skip weekends when remapping dates"
+      },
+      archived: {
+        type: "number",
+        description: "Include archived tasks (0 or 1)"
+      }
+    },
+    required: ["name", "templateId"]
   }
 };
 
@@ -328,6 +487,125 @@ export async function handleCreateListInFolder(parameters: any) {
     }, true);
   } catch (error: any) {
     return sponsorService.createErrorResponse(`Failed to create list in folder: ${error.message}`);
+  }
+}
+
+/**
+ * Handler for the create_list_from_template tool
+ * Creates a new list from a template inside a folder
+ */
+export async function handleCreateListFromTemplate(parameters: any) {
+  const { 
+    name, templateId, folderId, folderName, spaceId, spaceName,
+    return_immediately, content, time_estimate, automation, include_views,
+    old_due_date, old_start_date, old_followers, comment_attachments,
+    recur_settings, old_tags, old_statuses, subtasks, custom_type,
+    old_assignees, attachments, comment, old_status, external_dependencies,
+    internal_dependencies, priority, custom_fields, old_checklists,
+    relationships, old_subtask_assignees, start_date, due_date,
+    remap_start_date, skip_weekends, archived
+  } = parameters;
+  
+  // Validate required fields
+  if (!name) {
+    throw new Error("List name is required");
+  }
+  if (!templateId) {
+    throw new Error("Template ID is required");
+  }
+  
+  let targetFolderId = folderId;
+  
+  // If no folderId but folderName is provided, look up the folder ID
+  if (!targetFolderId && folderName) {
+    let targetSpaceId = spaceId;
+    
+    // If no spaceId provided but spaceName is, look up the space ID first
+    if (!targetSpaceId && spaceName) {
+      const spaceIdResult = await workspaceService.findSpaceByName(spaceName);
+      if (!spaceIdResult) {
+        throw new Error(`Space "${spaceName}" not found`);
+      }
+      targetSpaceId = spaceIdResult.id;
+    }
+    
+    if (!targetSpaceId) {
+      throw new Error("When using folderName to identify a folder, you must also provide either spaceId or spaceName to locate the correct folder. This is because folder names might not be unique across different spaces.");
+    }
+    
+    // Find the folder in the workspace hierarchy
+    const hierarchy = await workspaceService.getWorkspaceHierarchy();
+    const folderInfo = workspaceService.findIDByNameInHierarchy(hierarchy, folderName, 'folder');
+    if (!folderInfo) {
+      throw new Error(`Folder "${folderName}" not found in space`);
+    }
+    targetFolderId = folderInfo.id;
+  }
+  
+  if (!targetFolderId) {
+    throw new Error("Either folderId or folderName must be provided");
+  }
+
+  // Prepare list template data
+  const listData: CreateListFromTemplateData = {
+    name,
+    options: {}
+  };
+
+  // Add all optional template options
+  if (return_immediately !== undefined) listData.options!.return_immediately = return_immediately;
+  if (content) listData.options!.content = content;
+  if (time_estimate !== undefined) listData.options!.time_estimate = time_estimate;
+  if (automation !== undefined) listData.options!.automation = automation;
+  if (include_views !== undefined) listData.options!.include_views = include_views;
+  if (old_due_date !== undefined) listData.options!.old_due_date = old_due_date;
+  if (old_start_date !== undefined) listData.options!.old_start_date = old_start_date;
+  if (old_followers !== undefined) listData.options!.old_followers = old_followers;
+  if (comment_attachments !== undefined) listData.options!.comment_attachments = comment_attachments;
+  if (recur_settings !== undefined) listData.options!.recur_settings = recur_settings;
+  if (old_tags !== undefined) listData.options!.old_tags = old_tags;
+  if (old_statuses !== undefined) listData.options!.old_statuses = old_statuses;
+  if (subtasks !== undefined) listData.options!.subtasks = subtasks;
+  if (custom_type !== undefined) listData.options!.custom_type = custom_type;
+  if (old_assignees !== undefined) listData.options!.old_assignees = old_assignees;
+  if (attachments !== undefined) listData.options!.attachments = attachments;
+  if (comment !== undefined) listData.options!.comment = comment;
+  if (old_status !== undefined) listData.options!.old_status = old_status;
+  if (external_dependencies !== undefined) listData.options!.external_dependencies = external_dependencies;
+  if (internal_dependencies !== undefined) listData.options!.internal_dependencies = internal_dependencies;
+  if (priority !== undefined) listData.options!.priority = priority;
+  if (custom_fields !== undefined) listData.options!.custom_fields = custom_fields;
+  if (old_checklists !== undefined) listData.options!.old_checklists = old_checklists;
+  if (relationships !== undefined) listData.options!.relationships = relationships;
+  if (old_subtask_assignees !== undefined) listData.options!.old_subtask_assignees = old_subtask_assignees;
+  if (start_date) listData.options!.start_date = start_date;
+  if (due_date) listData.options!.due_date = due_date;
+  if (remap_start_date !== undefined) listData.options!.remap_start_date = remap_start_date;
+  if (skip_weekends !== undefined) listData.options!.skip_weekends = skip_weekends;
+  if (archived !== undefined) listData.options!.archived = archived;
+
+  try {
+    // Create the list from template in the folder
+    const newList = await listService.createListFromTemplate(targetFolderId, templateId, listData);
+    
+    return sponsorService.createResponse({
+      id: newList.id,
+      name: newList.name,
+      content: newList.content,
+      folder: {
+        id: newList.folder?.id,
+        name: newList.folder?.name
+      },
+      space: {
+        id: newList.space.id,
+        name: newList.space.name
+      },
+      url: `https://app.clickup.com/${config.clickupTeamId}/v/l/${newList.id}`,
+      templateId,
+      message: `List "${name}" created successfully from template in folder${newList.folder ? ` "${newList.folder.name}"` : ''}`
+    }, true);
+  } catch (error: any) {
+    return sponsorService.createErrorResponse(`Failed to create list from template: ${error.message}`);
   }
 }
 

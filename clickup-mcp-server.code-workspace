@@ -1,0 +1,371 @@
+{
+	"folders": [
+		{
+			"name": "ClickUp MCP Server",
+			"path": "."
+		}
+	],
+	"settings": {
+		"// Project Structure": "Settings for better development experience",
+		
+		// File Explorer
+		"explorer.sortOrder": "type",
+		"explorer.fileNesting.enabled": true,
+		"explorer.fileNesting.expand": false,
+		"explorer.fileNesting.patterns": {
+			"package.json": "package-lock.json, npm-shrinkwrap.json, yarn.lock, pnpm-lock.yaml",
+			"tsconfig.json": "tsconfig.*.json",
+			"*.ts": "${capture}.js, ${capture}.js.map, ${capture}.d.ts",
+			"*.js": "${capture}.js.map, ${capture}.d.ts",
+			"README.md": "CHANGELOG.md, CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, LICENSE*",
+			".env": ".env.*, .envrc, env.d.ts",
+			"docker-compose.yml": "docker-compose.*.yml, Dockerfile*, .dockerignore",
+			".gitignore": ".gitattributes, .gitmodules, .gitmessage, .mailmap, .git-blame*",
+			"*.md": "${capture}.*.md"
+		},
+
+		// TypeScript
+		"typescript.preferences.importModuleSpecifier": "relative",
+		"typescript.suggest.autoImports": true,
+		"typescript.updateImportsOnFileMove.enabled": "always",
+		"typescript.preferences.includePackageJsonAutoImports": "on",
+		
+		// Editor
+		"editor.formatOnSave": true,
+		"editor.codeActionsOnSave": {
+			"source.fixAll.eslint": "explicit",
+			"source.organizeImports": "explicit"
+		},
+		"editor.rulers": [100, 120],
+		"editor.wordWrap": "wordWrapColumn",
+		"editor.wordWrapColumn": 120,
+		"editor.tabSize": 2,
+		"editor.insertSpaces": true,
+		"editor.detectIndentation": false,
+		
+		// Files
+		"files.associations": {
+			"*.env.*": "properties",
+			"Dockerfile*": "dockerfile",
+			"*.md": "markdown"
+		},
+		"files.exclude": {
+			"**/node_modules": true,
+			"**/build": false,
+			"**/.git": true,
+			"**/*.js.map": true
+		},
+		"files.watcherExclude": {
+			"**/node_modules/**": true,
+			"**/build/**": true
+		},
+		
+		// Search
+		"search.exclude": {
+			"**/node_modules": true,
+			"**/build": true,
+			"**/*.log": true,
+			"**/.git": true
+		},
+		
+		// Git
+		"git.ignoreLimitWarning": true,
+		
+		// Terminal
+		"terminal.integrated.defaultProfile.windows": "PowerShell",
+		"terminal.integrated.profiles.windows": {
+			"PowerShell": {
+				"source": "PowerShell",
+				"icon": "terminal-powershell"
+			},
+			"Command Prompt": {
+				"path": [
+					"${env:windir}\\Sysnative\\cmd.exe",
+					"${env:windir}\\System32\\cmd.exe"
+				],
+				"args": [],
+				"icon": "terminal-cmd"
+			}
+		},
+		
+		// Extension: Path Intellisense
+		"path-intellisense.mappings": {
+			"@": "${workspaceFolder}/src",
+			"@services": "${workspaceFolder}/src/services",
+			"@tools": "${workspaceFolder}/src/tools",
+			"@utils": "${workspaceFolder}/src/utils",
+			"@types": "${workspaceFolder}/src/types",
+			"@config": "${workspaceFolder}/src/config",
+			"@middleware": "${workspaceFolder}/src/middleware"
+		},
+		
+		// Extension: Auto Import - ES6, TS, JSX, TSX
+		"autoimport.filesToScan": "**/*.{ts,tsx,js,jsx}",
+		"autoimport.showNotifications": true,
+		"autoimport.autoComplete": true,
+		
+		// Extension: Bracket Pair Colorizer (built-in alternative)
+		"editor.bracketPairColorization.enabled": true,
+		"editor.guides.bracketPairs": "active",
+		
+		// Extension: Error Lens
+		"errorLens.enabledDiagnosticLevels": [
+			"error",
+			"warning",
+			"info"
+		],
+		
+		// Extension: GitLens
+		"gitlens.views.repositories.files.layout": "tree",
+		"gitlens.advanced.messages": {
+			"suppressCommitHasNoPreviousCommitWarning": false,
+			"suppressCommitNotFoundWarning": false,
+			"suppressFileNotUnderSourceControlWarning": false,
+			"suppressGitVersionWarning": false,
+			"suppressLineUncommittedWarning": false,
+			"suppressNoRepositoryWarning": false
+		},
+		
+		// Extension: Thunder Client (API Testing)
+		"thunder-client.workspaceRelativePath": ".thunder-client",
+		
+		// Markdown
+		"markdown.preview.fontSize": 14,
+		"markdown.preview.lineHeight": 1.6,
+		
+		// JSON
+		"json.schemas": [
+			{
+				"fileMatch": ["package.json"],
+				"url": "https://json.schemastore.org/package.json"
+			},
+			{
+				"fileMatch": ["tsconfig.json", "tsconfig.*.json"],
+				"url": "https://json.schemastore.org/tsconfig.json"
+			}
+		]
+	},
+	"tasks": {
+		"version": "2.0.0",
+		"tasks": [
+			{
+				"label": "Build Project",
+				"type": "npm",
+				"script": "build",
+				"group": {
+					"kind": "build",
+					"isDefault": true
+				},
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"focus": false,
+					"panel": "shared"
+				},
+				"problemMatcher": ["$tsc"]
+			},
+			{
+				"label": "Start Development",
+				"type": "npm",
+				"script": "dev",
+				"group": "build",
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"focus": false,
+					"panel": "shared"
+				},
+				"problemMatcher": ["$tsc-watch"]
+			},
+			{
+				"label": "Start Production",
+				"type": "npm",
+				"script": "start",
+				"group": "build",
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"focus": false,
+					"panel": "shared"
+				},
+				"dependsOn": "Build Project"
+			},
+			{
+				"label": "Generate API Docs",
+				"type": "shell",
+				"command": "node",
+				"args": ["scripts/generate-api-docs.js"],
+				"group": "build",
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"focus": false,
+					"panel": "shared"
+				}
+			},
+			{
+				"label": "Generate Diagrams",
+				"type": "shell",
+				"command": "node",
+				"args": ["scripts/generate-diagrams.js"],
+				"group": "build",
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"focus": false,
+					"panel": "shared"
+				}
+			},
+			{
+				"label": "Generate All Documentation",
+				"dependsOrder": "sequence",
+				"dependsOn": [
+					"Generate API Docs",
+					"Generate Diagrams"
+				],
+				"group": "build",
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"focus": false,
+					"panel": "shared"
+				}
+			},
+			{
+				"label": "Clean Build",
+				"type": "shell",
+				"command": "rmdir",
+				"args": ["/s", "/q", "build"],
+				"windows": {
+					"command": "rmdir",
+					"args": ["/s", "/q", "build"]
+				},
+				"linux": {
+					"command": "rm",
+					"args": ["-rf", "build"]
+				},
+				"osx": {
+					"command": "rm",
+					"args": ["-rf", "build"]
+				},
+				"group": "build",
+				"presentation": {
+					"echo": true,
+					"reveal": "silent",
+					"focus": false,
+					"panel": "shared"
+				}
+			}
+		]
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Launch ClickUp MCP Server",
+				"type": "node",
+				"request": "launch",
+				"program": "${workspaceFolder}/build/index.js",
+				"args": [],
+				"env": {
+					"NODE_ENV": "development"
+				},
+				"console": "integratedTerminal",
+				"internalConsoleOptions": "neverOpen",
+				"skipFiles": [
+					"<node_internals>/**"
+				],
+				"preLaunchTask": "Build Project"
+			},
+			{
+				"name": "Debug TypeScript",
+				"type": "node",
+				"request": "launch",
+				"program": "${workspaceFolder}/src/index.ts",
+				"args": [],
+				"env": {
+					"NODE_ENV": "development"
+				},
+				"console": "integratedTerminal",
+				"internalConsoleOptions": "neverOpen",
+				"skipFiles": [
+					"<node_internals>/**"
+				],
+				"runtimeArgs": [
+					"--loader",
+					"ts-node/esm"
+				],
+				"resolveSourceMapLocations": [
+					"${workspaceFolder}/**",
+					"!**/node_modules/**"
+				]
+			},
+			{
+				"name": "Test API Documentation Generator",
+				"type": "node",
+				"request": "launch",
+				"program": "${workspaceFolder}/scripts/generate-api-docs.js",
+				"console": "integratedTerminal",
+				"internalConsoleOptions": "neverOpen",
+				"skipFiles": [
+					"<node_internals>/**"
+				]
+			},
+			{
+				"name": "Test Diagram Generator",
+				"type": "node",
+				"request": "launch",
+				"program": "${workspaceFolder}/scripts/generate-diagrams.js",
+				"console": "integratedTerminal",
+				"internalConsoleOptions": "neverOpen",
+				"skipFiles": [
+					"<node_internals>/**"
+				]
+			}
+		]
+	},
+	"extensions": {
+		"recommendations": [
+			// Language Support
+			"ms-vscode.vscode-typescript-next",
+			"bradlc.vscode-tailwindcss",
+			
+			// Development Tools
+			"esbenp.prettier-vscode",
+			"ms-vscode.vscode-json",
+			"redhat.vscode-yaml",
+			"ms-vscode.powershell",
+			
+			// Git & Version Control
+			"eamodio.gitlens",
+			"github.vscode-pull-request-github",
+			
+			// Productivity
+			"christian-kohler.path-intellisense",
+			"formulahendry.auto-rename-tag",
+			"streetsidesoftware.code-spell-checker",
+			"usernamehw.errorlens",
+			
+			// Markdown & Documentation
+			"yzhang.markdown-all-in-one",
+			"bierner.markdown-mermaid",
+			"shd101wyy.markdown-preview-enhanced",
+			
+			// API Development & Testing
+			"rangav.vscode-thunder-client",
+			"humao.rest-client",
+			
+			// File Management
+			"alefragnani.project-manager",
+			"ms-vscode.vscode-explorer-context",
+			
+			// Theme & UI
+			"pkief.material-icon-theme",
+			"ms-vscode.vscode-theme-github",
+			
+			// Containers & Docker (if needed)
+			"ms-vscode-remote.remote-containers",
+			"ms-azuretools.vscode-docker"
+		]
+	}
+}
